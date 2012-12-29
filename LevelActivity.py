@@ -22,6 +22,7 @@ from sugar3.activity.widgets import StopButton
 from sugar3.activity import activity
 from math import pi, sqrt
 from gettext import gettext as _
+from collections import deque
 
 ACCELEROMETER_DEVICE = '/sys/devices/platform/lis3lv02d/position'
 #ACCELEROMETER_DEVICE = 'a.txt'
@@ -30,7 +31,6 @@ def read_accelerometer(canvas):
     fh = open(ACCELEROMETER_DEVICE)
     string = fh.read()
     xyz = string[1:-2].split(',')
-    print xyz
     x = float(xyz[0]) / (64 * 18)
     y = float(xyz[1]) / (64 * 18)
     canvas.motion_cb(x, y)
@@ -53,6 +53,7 @@ class MyCanvas(Gtk.DrawingArea):
         self.x = 0
         self.y = 0
         self.center = (0, 0)
+        self.prev = deque([])
 
     def _draw_cb(self, drawing_area, cr):
         self.center = (self.width / 2, self.height / 2)
@@ -114,22 +115,32 @@ class MyCanvas(Gtk.DrawingArea):
         self.cr.fill()
 
         # 2. Update Text
-
         self.cr.set_source_rgb(0, 0, 0)
         self.cr.move_to(self.width - 100, self.height - 80)
         self.cr.set_font_size(20)
+
         # TRANS: X is for X axis
         self.cr.show_text(_("X: %.2f") % (self.x - self.width / 2,))
 
         self.cr.move_to(self.width - 99, self.height - 60)
         self.cr.set_font_size(20)
+
         # TRANS: Y is for Y axis
         self.cr.show_text(_("Y: %.2f") % (self.y - self.height / 2,))
 
 
     def motion_cb(self, x, y):
-        self.x = self.radius * x
-        self.y = self.radius * y
+        if len(self.prev) >= 2:
+            self.x = self.prev[-2][0] * 0.25 +  self.prev[-1][0] * 0.5 + \
+                     self.radius * x * 0.25
+            self.y = self.prev[-2][1] * 0.25 +  self.prev[-1][1] * 0.5 + \
+                     self.radius * y * 0.25
+            self.prev.popleft()
+            self.prev.append([self.x, self.y])
+        else:
+            self.x = self.radius * x
+            self.y = self.radius * y
+            self.prev.append([self.x, self.y])
 
         if self.x and self.y:
             r = sqrt((self.x * self.x) + (self.y * self.y))
