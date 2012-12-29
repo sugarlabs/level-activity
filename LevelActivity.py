@@ -20,6 +20,7 @@ from gi.repository import GObject
 from sugar3.activity import widgets
 from sugar3.activity.widgets import StopButton
 from sugar3.activity import activity
+from math import pi, sin, cos
 
 #ACCELEROMETER_DEVICE = '/sys/devices/platform/lis3lv02d/position'
 ACCELEROMETER_DEVICE = 'a.txt'
@@ -29,11 +30,12 @@ def read_accelerometer(canvas):
     string = fh.read()
     xyz = string.split(',')
     print xyz
-    x = float(xyz[0])
-    y = float(xyz[1])
+    x = float(xyz[0]) / 64
+    y = float(xyz[1]) / 64
     canvas.motion_cb(x, y)
     fh.close()
     GObject.timeout_add(100, read_accelerometer, canvas)    
+
 
 class MyCanvas(Gtk.DrawingArea):
     ''' Create a GTK+ widget on which we will draw using Cairo '''
@@ -51,6 +53,7 @@ class MyCanvas(Gtk.DrawingArea):
         self.y = 0
 
     def _draw_cb(self, drawing_area, cr):
+        self.radius = min(self.width / 2, self.height / 2)
         self.cr = cr
         cr.set_line_width(2)
         self.width = drawing_area.get_allocated_width()
@@ -64,27 +67,27 @@ class MyCanvas(Gtk.DrawingArea):
         cr.set_source_rgb(0.8, 0.8, 0.8)
         cr.arc(self.width / 2, self.height / 2,
                min(self.width / 2, self.height / 2), 0,
-               2 * 3.14)
+               2 * pi)
         cr.fill()
 
 
         cr.set_source_rgb(0, 0, 0)
         cr.arc(self.width / 2, self.height / 2,
                min(self.width / 2, self.height / 2) / 3, 0,
-               2 * 3.14)
+               2 * pi)
         cr.stroke()
 
 
         cr.set_source_rgb(0, 0, 0)
         cr.arc(self.width / 2, self.height / 2,
                min(self.width / 2, self.height / 2) * 2 / 3, 0,
-               2 * 3.14)
+               2 * pi)
         cr.stroke()
 
         cr.set_source_rgb(0, 0, 0)
         cr.arc(self.width / 2, self.height / 2,
                min(self.width / 2, self.height / 2), 0,
-               2 * 3.14)
+               2 * pi)
         cr.stroke()
 
         cr.move_to(self.width / 2 - min(self.width / 2, self.height / 2), self.height / 2)
@@ -99,7 +102,7 @@ class MyCanvas(Gtk.DrawingArea):
 
     def update_ball_and_text(self):
         self.cr.set_source_rgb(0, 0.453, 0)
-        self.cr.arc(self.x, self.y, 20, 0, 2 * 3.14)
+        self.cr.arc(self.x, self.y, 20, 0, 2 * pi)
         self.cr.fill()
 
         # Now update the text
@@ -114,17 +117,17 @@ class MyCanvas(Gtk.DrawingArea):
         self.cr.set_source_rgb(0, 0, 0)
         self.cr.move_to(self.width - 100, self.height - 80)
         self.cr.set_font_size(20)
-        self.cr.show_text("X: %.2f" % (self.x,))
+        self.cr.show_text("X: %.2f" % (self.x - self.width / 2,))
 
         self.cr.move_to(self.width - 99, self.height - 60)
         self.cr.set_font_size(20)
-        self.cr.show_text("Y: %.2f" % (self.y,))
+        self.cr.show_text("Y: %.2f" % (self.y - self.height / 2,))
 
 
     def motion_cb(self, x, y):
-        print x, y
-        self.x = x
-        self.y = y
+        angle = pi / 2 * x 
+        self.x = self.width  / 2 + sin(angle) * self.radius
+        self.y = self.height / 2 + cos(angle) * self.radius
         self.queue_draw()
 
     def get_dpi(self):
