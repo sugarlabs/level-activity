@@ -24,8 +24,8 @@ from math import pi, sqrt
 from gettext import gettext as _
 from collections import deque
 
-#ACCELEROMETER_DEVICE = '/sys/devices/platform/lis3lv02d/position'
-ACCELEROMETER_DEVICE = 'a.txt'
+ACCELEROMETER_DEVICE = '/sys/devices/platform/lis3lv02d/position'
+#ACCELEROMETER_DEVICE = 'a.txt'
 
 def read_accelerometer(canvas):
     fh = open(ACCELEROMETER_DEVICE)
