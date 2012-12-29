@@ -52,8 +52,10 @@ class MyCanvas(Gtk.DrawingArea):
         self.radius = 0
         self.x = 0
         self.y = 0
+        self.center = (0, 0)
 
     def _draw_cb(self, drawing_area, cr):
+        self.center = (self.width / 2, self.height / 2)
         self.radius = min(self.width / 2, self.height / 2)
         self.cr = cr
         cr.set_line_width(2)
@@ -73,36 +75,32 @@ class MyCanvas(Gtk.DrawingArea):
 
 
         cr.set_source_rgb(0, 0, 0)
-        cr.arc(self.width / 2, self.height / 2,
-               min(self.width / 2, self.height / 2) / 3, 0,
+        cr.arc(self.center[0], self.center[1],
+               self.radius / 3, 0,
                2 * pi)
         cr.stroke()
 
-
-        cr.set_source_rgb(0, 0, 0)
-        cr.arc(self.width / 2, self.height / 2,
-               min(self.width / 2, self.height / 2) * 2 / 3, 0,
+        cr.arc(self.center[0], self.center[1],
+               self.radius * 2 / 3, 0,
                2 * pi)
         cr.stroke()
 
-        cr.set_source_rgb(0, 0, 0)
-        cr.arc(self.width / 2, self.height / 2,
-               min(self.width / 2, self.height / 2), 0,
+        cr.arc(self.center[0], self.center[1],
+               self.radius, 0,
                2 * pi)
         cr.stroke()
 
-        cr.move_to(self.width / 2 - min(self.width / 2, self.height / 2), self.height / 2)
-        cr.line_to(self.width / 2 + min(self.width / 2, self.height / 2), self.height / 2)
+        cr.move_to(self.center[0] - self.radius, self.center[1])
+        cr.line_to(self.center[0] + self.radius, self.center[1])
         cr.stroke()
 
-        cr.move_to(self.width / 2, self.height / 2 - min(self.width / 2, self.height / 2))
-        cr.line_to(self.width / 2, self.height / 2 + min(self.width / 2, self.height / 2))
+        cr.move_to(self.center[0], self.center[1] - self.radius)
+        cr.line_to(self.center[0], self.center[1] + self.radius)
         cr.stroke()
 
         self.update_ball_and_text()
 
     def update_ball_and_text(self):
-        center = (self.width / 2, self.height / 2)
         self.cr.set_source_rgb(0, 0.453, 0)
         self.cr.arc(self.x, self.y, 20, 0, 2 * pi)
         self.cr.fill()
@@ -111,7 +109,8 @@ class MyCanvas(Gtk.DrawingArea):
 
         # 1. Clear Text
         self.cr.set_source_rgb(1, 1, 1)
-        self.cr.rectangle(self.width - 110, self.height - 110, self.width, self.height)
+        self.cr.rectangle(self.width - 110, self.height - 110,
+                          self.width, self.height)
         self.cr.fill()
 
         # 2. Update Text
@@ -139,17 +138,10 @@ class MyCanvas(Gtk.DrawingArea):
             self.x *= scale
             self.y *= scale
 
-        self.x += self.width  / 2
-        self.y += self.height / 2
+        self.x += self.center[0]
+        self.y += self.center[1]
 
         self.queue_draw()
-
-    def get_dpi(self):
-        return self._dpi
-
-    def set_dpi(self, dpi):
-        self._dpi = dpi
-
 
 class LevelActivity(activity.Activity):
     def __init__(self, handle):
