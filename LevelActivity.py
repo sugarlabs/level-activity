@@ -30,8 +30,8 @@ def read_accelerometer(canvas):
     string = fh.read()
     xyz = string.split(',')
     print xyz
-    x = float(xyz[0]) / 64
-    y = float(xyz[1]) / 64
+    x = float(xyz[0]) / (64 * 18)
+    y = float(xyz[1]) / (64 * 18)
     canvas.motion_cb(x, y)
     fh.close()
     GObject.timeout_add(100, read_accelerometer, canvas)    
