@@ -23,8 +23,8 @@ from sugar3.activity import activity
 from math import pi, sqrt
 from gettext import gettext as _
 
-ACCELEROMETER_DEVICE = '/sys/devices/platform/lis3lv02d/position'
-#ACCELEROMETER_DEVICE = 'a.txt'
+#ACCELEROMETER_DEVICE = '/sys/devices/platform/lis3lv02d/position'
+ACCELEROMETER_DEVICE = 'a.txt'
 
 def read_accelerometer(canvas):
     fh = open(ACCELEROMETER_DEVICE)
@@ -36,13 +36,6 @@ def read_accelerometer(canvas):
     canvas.motion_cb(x, y)
     fh.close()
     GObject.timeout_add(100, read_accelerometer, canvas)    
-
-def clip(a, minimum, maximum):
-    if a < minimum:
-        a = minimum
-    if a > maximum:
-        a = maximum
-    return a
 
 class MyCanvas(Gtk.DrawingArea):
     ''' Create a GTK+ widget on which we will draw using Cairo '''
@@ -141,7 +134,7 @@ class MyCanvas(Gtk.DrawingArea):
 
         if self.x and self.y:
             r = sqrt((self.x * self.x) + (self.y * self.y))
-            r1 = clip(r, 0, self.radius)
+            r1 = min(r, self.radius)
             scale = r1 / r
             self.x *= scale
             self.y *= scale
