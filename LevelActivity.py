@@ -20,7 +20,8 @@ from gi.repository import GObject
 from sugar3.activity import widgets
 from sugar3.activity.widgets import StopButton
 from sugar3.activity import activity
-from math import pi, sin, cos
+from math import pi, sqrt
+from gettext import gettext as _
 
 ACCELEROMETER_DEVICE = '/sys/devices/platform/lis3lv02d/position'
 #ACCELEROMETER_DEVICE = 'a.txt'
@@ -36,6 +37,12 @@ def read_accelerometer(canvas):
     fh.close()
     GObject.timeout_add(100, read_accelerometer, canvas)    
 
+def clip(a, minimum, maximum):
+    if a < minimum:
+        a = minimum
+    if a > maximum:
+        a = maximum
+    return a
 
 class MyCanvas(Gtk.DrawingArea):
     ''' Create a GTK+ widget on which we will draw using Cairo '''
@@ -102,6 +109,7 @@ class MyCanvas(Gtk.DrawingArea):
         self.update_ball_and_text()
 
     def update_ball_and_text(self):
+        center = (self.width / 2, self.height / 2)
         self.cr.set_source_rgb(0, 0.453, 0)
         self.cr.arc(self.x, self.y, 20, 0, 2 * pi)
         self.cr.fill()
@@ -118,18 +126,29 @@ class MyCanvas(Gtk.DrawingArea):
         self.cr.set_source_rgb(0, 0, 0)
         self.cr.move_to(self.width - 100, self.height - 80)
         self.cr.set_font_size(20)
-        self.cr.show_text("X: %.2f" % (self.x - self.width / 2,))
+        # TRANS: X is for X axis
+        self.cr.show_text(_("X: %.2f") % (self.x - self.width / 2,))
 
         self.cr.move_to(self.width - 99, self.height - 60)
         self.cr.set_font_size(20)
-        self.cr.show_text("Y: %.2f" % (self.y - self.height / 2,))
+        # TRANS: Y is for Y axis
+        self.cr.show_text(_("Y: %.2f") % (self.y - self.height / 2,))
 
 
     def motion_cb(self, x, y):
-        angle_x = pi / 2 * x
-        angle_y = pi / 2 * y
-        self.x = self.width  / 2 + self.radius * sin(angle_x)
-        self.y = self.height / 2 + self.radius * sin(angle_y)
+        self.x = self.radius * x
+        self.y = self.radius * y
+
+        if self.x and self.y:
+            r = sqrt((self.x * self.x) + (self.y * self.y))
+            r1 = clip(r, 0, self.radius)
+            scale = r1 / r
+            self.x *= scale
+            self.y *= scale
+
+        self.x += self.width  / 2
+        self.y += self.height / 2
+
         self.queue_draw()
 
     def get_dpi(self):
