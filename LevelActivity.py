@@ -24,8 +24,8 @@ from math import pi, sqrt
 from gettext import gettext as _
 from collections import deque
 
-ACCELEROMETER_DEVICE = '/sys/devices/platform/lis3lv02d/position'
-#ACCELEROMETER_DEVICE = 'a.txt'
+#ACCELEROMETER_DEVICE = '/sys/devices/platform/lis3lv02d/position'
+ACCELEROMETER_DEVICE = 'a.txt'
 
 def read_accelerometer(canvas):
     fh = open(ACCELEROMETER_DEVICE)
@@ -54,10 +54,12 @@ class MyCanvas(Gtk.DrawingArea):
         self.y = 0
         self.center = (0, 0)
         self.prev = deque([])
+        self.ball_radius = 20
 
     def _draw_cb(self, drawing_area, cr):
         self.center = (self.width / 2, self.height / 2)
-        self.radius = min(self.width / 2, self.height / 2)
+        self.radius = min(self.width / 2, self.height / 2) - \
+                      self.ball_radius - 20
         self.cr = cr
         cr.set_line_width(2)
         self.width = drawing_area.get_allocated_width()
@@ -69,13 +71,18 @@ class MyCanvas(Gtk.DrawingArea):
 
 
         cr.set_source_rgb(0.8, 0.8, 0.8)
-        cr.arc(self.width / 2, self.height / 2,
-               min(self.width / 2, self.height / 2), 0,
+        cr.arc(self.center[0], self.center[1],
+               self.radius, 0,
                2 * pi)
         cr.fill()
 
 
         cr.set_source_rgb(0, 0, 0)
+        cr.arc(self.center[0], self.center[1],
+               self.ball_radius + 2, 0,
+               2 * pi)
+        cr.stroke()
+
         cr.arc(self.center[0], self.center[1],
                self.radius / 3, 0,
                2 * pi)
@@ -102,20 +109,21 @@ class MyCanvas(Gtk.DrawingArea):
         self.update_ball_and_text()
 
     def update_ball_and_text(self):
-        self.cr.set_source_rgb(0, 0.453, 0)
-        self.cr.arc(self.x, self.y, 20, 0, 2 * pi)
+        # Build the ball
+        self.cr.set_source_rgb(0, 0.453, 0) # green
+        self.cr.arc(self.x, self.y, self.ball_radius, 0, 2 * pi)
         self.cr.fill()
 
         # Now update the text
 
         # 1. Clear Text
-        self.cr.set_source_rgb(1, 1, 1)
+        self.cr.set_source_rgb(1, 1, 1) # white
         self.cr.rectangle(self.width - 110, self.height - 110,
                           self.width, self.height)
         self.cr.fill()
 
         # 2. Update Text
-        self.cr.set_source_rgb(0, 0, 0)
+        self.cr.set_source_rgb(0, 0, 0) # black
         self.cr.move_to(self.width - 100, self.height - 80)
         self.cr.set_font_size(20)
 
