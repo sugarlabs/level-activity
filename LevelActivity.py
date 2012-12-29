@@ -28,7 +28,7 @@ ACCELEROMETER_DEVICE = '/sys/devices/platform/lis3lv02d/position'
 def read_accelerometer(canvas):
     fh = open(ACCELEROMETER_DEVICE)
     string = fh.read()
-    xyz = string.split(',')
+    xyz = string[1:-2].split(',')
     print xyz
     x = float(xyz[0]) / (64 * 18)
     y = float(xyz[1]) / (64 * 18)
@@ -49,6 +49,7 @@ class MyCanvas(Gtk.DrawingArea):
         self.cr = None
         self.width = 0
         self.height = 0
+        self.radius = 0
         self.x = 0
         self.y = 0
 
