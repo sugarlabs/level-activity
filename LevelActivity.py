@@ -126,9 +126,10 @@ class MyCanvas(Gtk.DrawingArea):
 
 
     def motion_cb(self, x, y):
-        angle = pi / 2 * x 
-        self.x = self.width  / 2 + sin(angle) * self.radius
-        self.y = self.height / 2 + cos(angle) * self.radius
+        angle_x = pi / 2 * x
+        angle_y = pi / 2 * y
+        self.x = self.width  / 2 + self.radius * sin(angle_x)
+        self.y = self.height / 2 + self.radius * sin(angle_y)
         self.queue_draw()
 
     def get_dpi(self):
