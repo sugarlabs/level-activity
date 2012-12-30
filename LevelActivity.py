@@ -73,7 +73,7 @@ class MyCanvas(Gtk.DrawingArea):
         cr.fill()
 
 
-        cr.set_source_rgb(0.8, 0.8, 0.8)
+        cr.set_source_rgb(0.9450, 0.9450, 0.9450)
         cr.arc(self.center[0], self.center[1],
                self.radius, 0,
                2 * pi)
@@ -113,7 +113,7 @@ class MyCanvas(Gtk.DrawingArea):
 
     def update_ball_and_text(self):
         # Build the ball
-        self.cr.set_source_rgb(0, 0.453, 0) # green
+        self.cr.set_source_rgb(0.3012, 0.6, 1) # blue
         self.cr.arc(self.x, self.y, self.ball_radius, 0, 2 * pi)
         self.cr.fill()
 
