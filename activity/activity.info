@@ -1,7 +1,7 @@
 [Activity]
 name = Level
 bundle_id = net.flossmanuals.LevelActivity
-icon = level
+icon = Level
 exec = sugar-activity LevelActivity.LevelActivity
 show_launcher = yes
 mime_types = text/plain;application/zip
