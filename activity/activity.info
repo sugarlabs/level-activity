@@ -1,6 +1,6 @@
 [Activity]
 name = Level
-bundle_id = net.lionaneesh.LevelActivity
+bundle_id = net.flossmanuals.LevelActivity
 icon = Level
 exec = sugar-activity LevelActivity.LevelActivity
 show_launcher = yes
