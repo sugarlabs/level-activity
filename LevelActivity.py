@@ -31,11 +31,14 @@ def read_accelerometer(canvas):
     fh = open(ACCELEROMETER_DEVICE)
     string = fh.read()
     xyz = string[1:-2].split(',')
-    x = float(xyz[0]) / (64 * 18)
-    y = float(xyz[1]) / (64 * 18)
-    canvas.motion_cb(x, y)
-    fh.close()
-    GObject.timeout_add(100, read_accelerometer, canvas)    
+    try:
+        x = float(xyz[0]) / (64 * 18)
+        y = float(xyz[1]) / (64 * 18)
+        fh.close()
+        canvas.motion_cb(x, y)
+    except:
+        pass
+    GObject.timeout_add(100, read_accelerometer, canvas)
 
 class MyCanvas(Gtk.DrawingArea):
     ''' Create a GTK+ widget on which we will draw using Cairo '''
