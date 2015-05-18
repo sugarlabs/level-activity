@@ -4,6 +4,5 @@ bundle_id = net.flossmanuals.LevelActivity
 icon = Level
 exec = sugar-activity LevelActivity.LevelActivity
 show_launcher = yes
-mime_types = text/plain;application/zip
 activity_version = 1
 license = GPLv2+
