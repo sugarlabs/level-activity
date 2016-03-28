@@ -132,14 +132,14 @@ class MyCanvas(Gtk.DrawingArea):
         self.cr.move_to(self.width - 100, self.height - 80)
         self.cr.set_font_size(20)
 
-        # TRANS: X is for X axis
-        self.cr.show_text(_("X: %.2f") % (self.x - self.width / 2,))
+        # TRANS: x is for x-axis
+        self.cr.show_text(_("x: %.2f") % (self.x - self.width / 2,))
 
         self.cr.move_to(self.width - 99, self.height - 60)
         self.cr.set_font_size(20)
 
-        # TRANS: Y is for Y axis
-        self.cr.show_text(_("Y: %.2f") % (self.y - self.height / 2,))
+        # TRANS: y is for y-axis
+        self.cr.show_text(_("y: %.2f") % (self.y - self.height / 2,))
 
 
     def motion_cb(self, x, y):
