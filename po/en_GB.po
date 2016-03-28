@@ -25,7 +25,7 @@ msgstr "Level"
 #: LevelActivity.py:134
 #, python-format
 msgid "x: %.2f"
-msgstr "X: %.2f"
+msgstr "x: %.2f"
 
 #. TRANS: y is for y-axis
 #: LevelActivity.py:140
