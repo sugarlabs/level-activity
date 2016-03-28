@@ -1,6 +1,6 @@
-# SOME DESCRIPTIVE TITLE.
+# OLPC Level Activity.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
+# This file is distributed under the same license as the Level package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 msgid ""
 msgstr ""
@@ -21,14 +21,14 @@ msgstr ""
 msgid "Level"
 msgstr "Niveau"
 
-#. TRANS: X is for X axis
+#. TRANS: x is for x-axis
 #: LevelActivity.py:134
 #, python-format
-msgid "X: %.2f"
-msgstr "X: %.2f"
+msgid "x: %.2f"
+msgstr "x: %.2f"
 
-#. TRANS: Y is for Y axis
+#. TRANS: y is for y-axis
 #: LevelActivity.py:140
 #, python-format
-msgid "Y: %.2f"
-msgstr "Y: %.2f"
+msgid "y: %.2f"
+msgstr "y: %.2f"
