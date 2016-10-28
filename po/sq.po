@@ -7,8 +7,8 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-12-30 23:58+0530\n"
-"PO-Revision-Date: 2016-03-29 00:16+0000\n"
-"Last-Translator: Chris <cjl@sugarlabs.org>\n"
+"PO-Revision-Date: 2016-10-22 17:22+0000\n"
+"Last-Translator: Besnik_b <besnik@programeshqip.org>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: sq\n"
 "MIME-Version: 1.0\n"
@@ -16,11 +16,11 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.1.1\n"
-"X-POOTLE-MTIME: 1459210609.000000\n"
+"X-POOTLE-MTIME: 1477156969.000000\n"
 
 #: activity/activity.info:2
 msgid "Level"
-msgstr ""
+msgstr "Nivel"
 
 #. TRANS: x is for x-axis
 #: LevelActivity.py:134
