@@ -7,37 +7,38 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-12-30 23:58+0530\n"
-"PO-Revision-Date: 2016-03-29 00:17+0000\n"
-"Last-Translator: Chris <cjl@sugarlabs.org>\n"
+"PO-Revision-Date: 2016-04-20 20:37+0000\n"
+"Last-Translator: Anna <leonteva.anna.e@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: ayc\n"
+"Language: ru\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.1.1\n"
-"X-POOTLE-MTIME: 1459210655.000000\n"
+"X-POOTLE-MTIME: 1461184675.000000\n"
 
 #: activity/activity.info:2
 msgid "Level"
-msgstr "Siqi"
+msgstr "Уровень"
 
 #. TRANS: x is for x-axis
 #: LevelActivity.py:134
 #, python-format
 msgid "x: %.2f"
-msgstr "x: %.2f wakichata"
+msgstr "x: %.2f"
 
 #. TRANS: y is for y-axis
 #: LevelActivity.py:140
 #, python-format
 msgid "y: %.2f"
-msgstr "y: %.2f wakichata"
+msgstr "y: %.2f"
 
 #, python-format
 #~ msgid "X: %.2f"
-#~ msgstr "X: %.2f wakichata"
+#~ msgstr "X: %.2f"
 
 #, python-format
 #~ msgid "Y: %.2f"
-#~ msgstr "Y: %.2f wakichata"
+#~ msgstr "Y: %.2f"
