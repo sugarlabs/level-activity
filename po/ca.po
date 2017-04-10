@@ -33,3 +33,11 @@ msgstr "x: %.2f"
 #, python-format
 msgid "y: %.2f"
 msgstr "y: %.2f"
+
+#, python-format
+#~ msgid "X: %.2f"
+#~ msgstr "X: %.2f"
+
+#, python-format
+#~ msgid "Y: %.2f"
+#~ msgstr "Y: %.2f"
