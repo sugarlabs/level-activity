@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-12-30 23:58+0530\n"
-"PO-Revision-Date: 2016-04-17 17:59+0000\n"
+"PO-Revision-Date: 2017-02-21 21:48+0000\n"
 "Last-Translator: Markus <m.slg@gmx.de>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: de\n"
@@ -16,12 +16,12 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.1.1\n"
-"X-POOTLE-MTIME: 1460915999.000000\n"
+"X-POOTLE-MTIME: 1487713682.000000\n"
 
 # https://wiki.sugarlabs.org/go/Activities/Level_Tool
 #: activity/activity.info:2
 msgid "Level"
-msgstr ""
+msgstr "Wasserwaage"
 
 #. TRANS: x is for x-axis
 #: LevelActivity.py:134
