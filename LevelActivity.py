@@ -16,7 +16,7 @@
 # 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 from gi.repository import Gtk
-from gi.repository import GObject
+from gi.repository import GLib
 from sugar3.activity.widgets import StopButton
 from sugar3.activity.widgets import ActivityToolbarButton
 from sugar3.activity import activity
@@ -27,33 +27,15 @@ from gettext import gettext as _
 from collections import deque
 
 ACCELEROMETER_DEVICE = '/sys/devices/platform/lis3lv02d/position'
-#ACCELEROMETER_DEVICE = 'a.txt'
+# ACCELEROMETER_DEVICE = 'a.txt'
 
-def read_accelerometer(canvas):
-    fh = open(ACCELEROMETER_DEVICE)
-    string = fh.read()
-    xyz = string[1:-2].split(',')
-    try:
-        x = float(xyz[0]) / (64 * 18)
-        y = float(xyz[1]) / (64 * 18)
-        fh.close()
-        canvas.motion_cb(x, y)
-    except:
-        pass
-    GObject.timeout_add(100, read_accelerometer, canvas)
 
 class MyCanvas(Gtk.DrawingArea):
-    ''' Create a GTK+ widget on which we will draw using Cairo '''
+    ''' Create a GTK+ widget on which we will draw '''
 
     def __init__(self):
         Gtk.DrawingArea.__init__(self)
-        self._draw_ruler = False
-        self._object = None
         self.connect('draw', self._draw_cb)
-        self._dpi = 96
-        self.cr = None
-        self.width = 0
-        self.height = 0
         self.radius = 0
         self.x = 0
         self.y = 0
@@ -62,47 +44,37 @@ class MyCanvas(Gtk.DrawingArea):
         self.ball_radius = 20
 
     def _draw_cb(self, drawing_area, cr):
-        self.center = (self.width / 2, self.height / 2)
-        self.radius = min(self.width / 2, self.height / 2) - \
-                      self.ball_radius - 20
-        self.cr = cr
+        width = drawing_area.get_allocated_width()
+        height = drawing_area.get_allocated_height()
+        self.center = (width / 2, height / 2)
+        self.radius = min(width / 2, height / 2) - self.ball_radius - 20
         cr.set_line_width(2)
-        self.width = drawing_area.get_allocated_width()
-        self.height = drawing_area.get_allocated_height()
 
+        # display background
         cr.set_source_rgb(1, 1, 1)
-        cr.rectangle(0, 0, self.width, self.height)
+        cr.rectangle(0, 0, width, height)
         cr.fill()
 
-
+        # target background
         cr.set_source_rgb(0.9450, 0.9450, 0.9450)
-        cr.arc(self.center[0], self.center[1],
-               self.radius, 0,
-               2 * pi)
+        cr.arc(self.center[0], self.center[1], self.radius, 0, 2 * pi)
         cr.fill()
 
-
+        # target rings, inner to outer
         cr.set_source_rgb(0, 0, 0)
-        cr.arc(self.center[0], self.center[1],
-               self.ball_radius + 2, 0,
-               2 * pi)
+        cr.arc(self.center[0], self.center[1], self.ball_radius + 2, 0, 2 * pi)
         cr.stroke()
 
-        cr.arc(self.center[0], self.center[1],
-               self.radius / 3, 0,
-               2 * pi)
+        cr.arc(self.center[0], self.center[1], self.radius / 3, 0, 2 * pi)
         cr.stroke()
 
-        cr.arc(self.center[0], self.center[1],
-               self.radius * 2 / 3, 0,
-               2 * pi)
+        cr.arc(self.center[0], self.center[1], self.radius * 2 / 3, 0, 2 * pi)
         cr.stroke()
 
-        cr.arc(self.center[0], self.center[1],
-               self.radius, 0,
-               2 * pi)
+        cr.arc(self.center[0], self.center[1], self.radius, 0, 2 * pi)
         cr.stroke()
 
+        # axes
         cr.move_to(self.center[0] - self.radius, self.center[1])
         cr.line_to(self.center[0] + self.radius, self.center[1])
         cr.stroke()
@@ -111,43 +83,31 @@ class MyCanvas(Gtk.DrawingArea):
         cr.line_to(self.center[0], self.center[1] + self.radius)
         cr.stroke()
 
-        self.update_ball_and_text()
+        # the ball
+        cr.set_source_rgb(0.3012, 0.6, 1)  # blue
+        cr.arc(self.x, self.y, self.ball_radius, 0, 2 * pi)
+        cr.fill()
 
-    def update_ball_and_text(self):
-        # Build the ball
-        self.cr.set_source_rgb(0.3012, 0.6, 1) # blue
-        self.cr.arc(self.x, self.y, self.ball_radius, 0, 2 * pi)
-        self.cr.fill()
-
-        # Now update the text
-
-        # 1. Clear Text
-        self.cr.set_source_rgb(1, 1, 1) # white
-        self.cr.rectangle(self.width - 110, self.height - 110,
-                          self.width, self.height)
-        self.cr.fill()
-
-        # 2. Update Text
-        self.cr.set_source_rgb(0, 0, 0) # black
-        self.cr.move_to(self.width - 100, self.height - 80)
-        self.cr.set_font_size(20)
+        # the text
+        cr.set_source_rgb(0, 0, 0)  # black
+        cr.move_to(width - 100, height - 80)
+        cr.set_font_size(20)
 
         # TRANS: x is for x-axis
-        self.cr.show_text(_("x: %.2f") % (self.x - self.width / 2,))
+        cr.show_text(_("x: %.2f") % (self.x - width / 2,))
 
-        self.cr.move_to(self.width - 99, self.height - 60)
-        self.cr.set_font_size(20)
+        cr.move_to(width - 99, height - 60)
+        cr.set_font_size(20)
 
         # TRANS: y is for y-axis
-        self.cr.show_text(_("y: %.2f") % (self.y - self.height / 2,))
-
+        cr.show_text(_("y: %.2f") % (self.y - height / 2,))
 
     def motion_cb(self, x, y):
         if len(self.prev) >= 2:
-            self.x = self.prev[-2][0] * 0.25 +  self.prev[-1][0] * 0.5 + \
-                     self.radius * x * 0.25
-            self.y = self.prev[-2][1] * 0.25 +  self.prev[-1][1] * 0.5 + \
-                     self.radius * y * 0.25
+            self.x = self.prev[-2][0] * 0.25 + self.prev[-1][0] * 0.5 + \
+                self.radius * x * 0.25
+            self.y = self.prev[-2][1] * 0.25 + self.prev[-1][1] * 0.5 + \
+                self.radius * y * 0.25
             self.prev.popleft()
             self.prev.append([self.x, self.y])
         else:
@@ -166,6 +126,7 @@ class MyCanvas(Gtk.DrawingArea):
         self.y += self.center[1]
 
         self.queue_draw()
+
 
 class LevelActivity(activity.Activity):
     def __init__(self, handle):
@@ -189,8 +150,25 @@ class LevelActivity(activity.Activity):
         toolbar_box.show_all()
 
         # Draw the canvas
-        self._canvas = MyCanvas()
-        self.set_canvas(self._canvas)
-        self._canvas.show()
+        canvas = MyCanvas()
+        self.set_canvas(canvas)
+        canvas.show()
 
-        GObject.timeout_add(100, read_accelerometer, self._canvas)
+        self._timeout = GLib.timeout_add(100, self._timeout_cb, canvas)
+
+    def _timeout_cb(self, canvas):
+        fh = open(ACCELEROMETER_DEVICE)
+        string = fh.read()
+        xyz = string[1:-2].split(',')
+        try:
+            x = float(xyz[0]) / (64 * 18)
+            y = float(xyz[1]) / (64 * 18)
+            fh.close()
+            canvas.motion_cb(x, y)
+        except:
+            pass
+        return True
+
+    def close(self):
+        GLib.source_remove(self._timeout)
+        activity.Activity.close(self)
