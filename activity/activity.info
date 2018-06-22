@@ -7,7 +7,6 @@ show_launcher = yes
 activity_version = 2
 license = GPLv2+
 repository = https://github.com/sugarlabs/level-activity.git
-max_participants = 1
 url = https://help.sugarlabs.org/en/level_tool.html
 tags = Maths;Science
 summary = Check inclination of surface with respect to ground.
