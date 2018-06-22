@@ -15,6 +15,9 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
+import gi
+gi.require_version('Gtk', '3.0')
+
 from gi.repository import Gtk
 from gi.repository import GLib
 from sugar3.activity.widgets import StopButton
@@ -26,6 +29,8 @@ from math import pi, sqrt
 from gettext import gettext as _
 from collections import deque
 
+from collabwrapper import CollabWrapper
+
 ACCELEROMETER_DEVICE = '/sys/devices/platform/lis3lv02d/position'
 # ACCELEROMETER_DEVICE = 'a.txt'
 
@@ -33,7 +38,8 @@ ACCELEROMETER_DEVICE = '/sys/devices/platform/lis3lv02d/position'
 class MyCanvas(Gtk.DrawingArea):
     ''' Create a GTK+ widget on which we will draw '''
 
-    def __init__(self):
+    def __init__(self, me):
+        self.me = me
         Gtk.DrawingArea.__init__(self)
         self.connect('draw', self._draw_cb)
         self.radius = 0
@@ -83,8 +89,15 @@ class MyCanvas(Gtk.DrawingArea):
         cr.line_to(self.center[0], self.center[1] + self.radius)
         cr.stroke()
 
-        # the ball
-        cr.set_source_rgb(0.3012, 0.6, 1)  # blue
+        # our buddies balls
+        for buddy, xy in self.me.buddies.iteritems():
+            (x, y) = xy
+            cr.set_source_rgb(0.25, 0.25, 0.25)  # 25% gray
+            cr.arc(x, y, self.ball_radius, 0, 2 * pi)
+            cr.stroke()
+
+        # our own ball
+        cr.set_source_rgb(0, 0, 0)  # black
         cr.arc(self.x, self.y, self.ball_radius, 0, 2 * pi)
         cr.fill()
 
@@ -133,6 +146,8 @@ class LevelActivity(activity.Activity):
         "The entry point to the Activity"
         activity.Activity.__init__(self, handle)
 
+        self.buddies = {}
+
         toolbar_box = ToolbarBox()
 
         activity_button = ActivityToolbarButton(self)
@@ -150,10 +165,16 @@ class LevelActivity(activity.Activity):
         toolbar_box.show_all()
 
         # Draw the canvas
-        canvas = MyCanvas()
+        canvas = MyCanvas(self)
         self.set_canvas(canvas)
         canvas.show()
 
+        self._collab = CollabWrapper(self)
+        self._collab.message.connect(self.__message_cb)
+        self._collab.buddy_left.connect(self.__buddy_left_cb)
+        self._collab.setup()
+
+        self._fuse = 1
         self._timeout = GLib.timeout_add(100, self._timeout_cb, canvas)
 
     def _timeout_cb(self, canvas):
@@ -166,9 +187,30 @@ class LevelActivity(activity.Activity):
             fh.close()
             canvas.motion_cb(x, y)
         except:
-            pass
+            return True
+
+        self._fuse -= 1
+        if self._fuse == 0:
+            self._collab.post({'action': '%d,%d' % (canvas.x, canvas.y)})
+            self._fuse = 5
+
         return True
 
     def close(self):
         GLib.source_remove(self._timeout)
         activity.Activity.close(self)
+
+    def get_data(self):
+        return None
+
+    def set_data(self, data):
+        pass
+
+    def __message_cb(self, collab, buddy, msg):
+        action = msg.get('action')
+        if ',' in action:
+            x, y = action.split(',')
+            self.buddies[buddy.props.key] = (int(x), int(y))
+
+    def __buddy_left_cb(self, collab, buddy):
+        del self.buddies[buddy.props.key]
