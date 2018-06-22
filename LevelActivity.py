@@ -24,6 +24,8 @@ from sugar3.activity.widgets import StopButton
 from sugar3.activity.widgets import ActivityToolbarButton
 from sugar3.activity import activity
 from sugar3.graphics.toolbarbox import ToolbarBox
+from sugar3.graphics.alert import Alert
+from sugar3.graphics.icon import Icon
 
 from math import pi, sqrt
 from gettext import gettext as _
@@ -97,9 +99,10 @@ class MyCanvas(Gtk.DrawingArea):
             cr.stroke()
 
         # our own ball
-        cr.set_source_rgb(0, 0, 0)  # black
-        cr.arc(self.x, self.y, self.ball_radius, 0, 2 * pi)
-        cr.fill()
+        if self.me.accelerometer:
+            cr.set_source_rgb(0, 0, 0)  # black
+            cr.arc(self.x, self.y, self.ball_radius, 0, 2 * pi)
+            cr.fill()
 
         # the text
         cr.set_source_rgb(0, 0, 0)  # black
@@ -138,13 +141,22 @@ class MyCanvas(Gtk.DrawingArea):
         self.x += self.center[0]
         self.y += self.center[1]
 
-        self.queue_draw()
-
 
 class LevelActivity(activity.Activity):
     def __init__(self, handle):
         "The entry point to the Activity"
         activity.Activity.__init__(self, handle)
+        self._timeout = None
+
+        self.accelerometer = False
+        try:
+            open(ACCELEROMETER_DEVICE).close()
+            self.accelerometer = True
+        except:
+            pass
+
+        if not self.accelerometer and not self.shared_activity:
+            return self._incompatible()
 
         self.buddies = {}
 
@@ -178,26 +190,26 @@ class LevelActivity(activity.Activity):
         self._timeout = GLib.timeout_add(100, self._timeout_cb, canvas)
 
     def _timeout_cb(self, canvas):
-        fh = open(ACCELEROMETER_DEVICE)
-        string = fh.read()
-        xyz = string[1:-2].split(',')
-        try:
+        if self.accelerometer:
+            fh = open(ACCELEROMETER_DEVICE)
+            xyz = fh.read()[1:-2].split(',')
+            fh.close()
             x = float(xyz[0]) / (64 * 18)
             y = float(xyz[1]) / (64 * 18)
-            fh.close()
             canvas.motion_cb(x, y)
-        except:
-            return True
+            canvas.queue_draw()
 
         self._fuse -= 1
         if self._fuse == 0:
-            self._collab.post({'action': '%d,%d' % (canvas.x, canvas.y)})
+            if self.accelerometer:
+                self._collab.post({'action': '%d,%d' % (canvas.x, canvas.y)})
             self._fuse = 5
 
         return True
 
     def close(self):
-        GLib.source_remove(self._timeout)
+        if self._timeout:
+            GLib.source_remove(self._timeout)
         activity.Activity.close(self)
 
     def get_data(self):
@@ -211,6 +223,37 @@ class LevelActivity(activity.Activity):
         if ',' in action:
             x, y = action.split(',')
             self.buddies[buddy.props.key] = (int(x), int(y))
+            if not self.accelerometer:
+                self.get_canvas().queue_draw()
 
     def __buddy_left_cb(self, collab, buddy):
         del self.buddies[buddy.props.key]
+
+    def _incompatible(self):
+        ''' Display abbreviated activity user interface with alert '''
+        toolbox = ToolbarBox()
+        stop = StopButton(self)
+        toolbox.toolbar.add(stop)
+        self.set_toolbar_box(toolbox)
+
+        title = _('Activity not compatible with this system.')
+        msg = _('Please erase the activity.')
+        alert = Alert(title=title, msg=msg)
+        alert.add_button(0, 'Stop', Icon(icon_name='activity-stop'))
+        self.add_alert(alert)
+
+        label = Gtk.Label(_('You do not have an accelerometer.'))
+        self.set_canvas(label)
+
+        alert.connect('response', self.__incompatible_response_cb)
+        stop.connect('clicked', self.__incompatible_stop_clicked_cb,
+                     alert)
+
+        self.show_all()
+
+    def __incompatible_stop_clicked_cb(self, button, alert):
+        self.remove_alert(alert)
+
+    def __incompatible_response_cb(self, alert, response):
+        self.remove_alert(alert)
+        self.close()
