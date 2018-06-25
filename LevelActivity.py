@@ -100,11 +100,14 @@ class MyCanvas(Gtk.DrawingArea):
             cr.arc(x, y, self.ball_radius, 0, 2 * pi)
             cr.stroke()
 
+        # do not draw our own ball and text if we have no data
+        if not self.me.accelerometer:
+            return
+
         # our own ball
-        if self.me.accelerometer:
-            cr.set_source_rgb(0, 0, 0)  # black
-            cr.arc(self.x, self.y, self.ball_radius, 0, 2 * pi)
-            cr.fill()
+        cr.set_source_rgb(0, 0, 0)  # black
+        cr.arc(self.x, self.y, self.ball_radius, 0, 2 * pi)
+        cr.fill()
 
         # the text
         cr.set_source_rgb(0, 0, 0)  # black
