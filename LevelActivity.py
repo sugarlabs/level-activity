@@ -241,10 +241,14 @@ class LevelActivity(activity.Activity):
             (data, ip4_address) = data
             if ip4_address in self.hosts:
                 key = self.hosts[ip4_address]
-                (x, y) = data.split(',')
-                self.buddies[key] = (int(x), int(y))
-                if not self.accelerometer:
-                    self.get_canvas().queue_draw()
+            else:
+                key = ip4_address
+                self.hosts[key] = ip4_address  # temporary
+
+            (x, y) = data.split(',')
+            self.buddies[key] = (int(x), int(y))
+            if not self.accelerometer:
+                self.get_canvas().queue_draw()
             data = self._udp.get()
 
         return True
@@ -269,6 +273,8 @@ class LevelActivity(activity.Activity):
                 self.get_canvas().queue_draw()
 
     def __buddy_joined_cb(self, collab, buddy):
+        if buddy.props.ip4_address in self.hosts:
+            del self.buddies[self.hosts[buddy.props.ip4_address]]  # temporary
         self.hosts[buddy.props.ip4_address] = buddy.props.key
 
     def __buddy_left_cb(self, collab, buddy):
