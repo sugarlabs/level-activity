@@ -32,6 +32,8 @@ from gettext import gettext as _
 from collections import deque
 
 from collabwrapper import CollabWrapper
+import socket
+import select
 
 ACCELEROMETER_DEVICE = '/sys/devices/platform/lis3lv02d/position'
 # ACCELEROMETER_DEVICE = 'a.txt'
@@ -142,6 +144,27 @@ class MyCanvas(Gtk.DrawingArea):
         self.y += self.center[1]
 
 
+class Udp():
+    addr = '224.0.0.1'
+    port = 4628
+    size = 32
+
+    def __init__(self):
+        self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        self.socket.bind(('', self.port))
+
+    def put(self, data):
+        self.socket.sendto(data, (self.addr, self.port))
+
+    def get(self):
+        r, w, e = select.select([self.socket], [], [], 0)
+        if self.socket in r:
+            (data, address) = self.socket.recvfrom(self.size)
+            return (data, address[0])
+        return None
+
+
 class LevelActivity(activity.Activity):
     def __init__(self, handle):
         "The entry point to the Activity"
@@ -179,8 +202,12 @@ class LevelActivity(activity.Activity):
         toolbar_box.toolbar.insert(StopButton(self), -1)
         toolbar_box.show_all()
 
+        self._udp = Udp()
+        self.hosts = {}
+
         self._collab = CollabWrapper(self)
         self._collab.message.connect(self.__message_cb)
+        self._collab.buddy_joined.connect(self.__buddy_joined_cb)
         self._collab.buddy_left.connect(self.__buddy_left_cb)
         self._collab.setup()
 
@@ -201,7 +228,24 @@ class LevelActivity(activity.Activity):
         if self._fuse == 0:
             if self.accelerometer:
                 self._collab.post({'action': '%d,%d' % (canvas.x, canvas.y)})
-            self._fuse = 5
+            self._fuse = 10
+
+        if not self.shared_activity:
+            return True
+
+        if self.accelerometer:
+            self._udp.put('%d,%d' % (canvas.x, canvas.y))
+
+        data = self._udp.get()
+        while data:
+            (data, ip4_address) = data
+            if ip4_address in self.hosts:
+                key = self.hosts[ip4_address]
+                (x, y) = data.split(',')
+                self.buddies[key] = (int(x), int(y))
+                if not self.accelerometer:
+                    self.get_canvas().queue_draw()
+            data = self._udp.get()
 
         return True
 
@@ -224,8 +268,14 @@ class LevelActivity(activity.Activity):
             if not self.accelerometer:
                 self.get_canvas().queue_draw()
 
+    def __buddy_joined_cb(self, collab, buddy):
+        self.hosts[buddy.props.ip4_address] = buddy.props.key
+
     def __buddy_left_cb(self, collab, buddy):
-        del self.buddies[buddy.props.key]
+        if buddy.props.key in self.buddies:
+            del self.buddies[buddy.props.key]
+        if buddy.props.ip4_address in self.hosts:
+            del self.hosts[buddy.props.ip4_address]
 
     def _incompatible(self):
         ''' Display abbreviated activity user interface with alert '''
