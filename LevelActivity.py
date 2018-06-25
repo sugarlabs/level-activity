@@ -20,8 +20,8 @@ gi.require_version('Gtk', '3.0')
 
 from gi.repository import Gtk
 from gi.repository import GLib
-from sugar3.activity.widgets import StopButton
-from sugar3.activity.widgets import ActivityToolbarButton
+from sugar3.activity.widgets import ActivityButton, TitleEntry, \
+     DescriptionItem, ShareButton, StopButton
 from sugar3.activity import activity
 from sugar3.graphics.toolbarbox import ToolbarBox
 from sugar3.graphics.alert import Alert
@@ -160,26 +160,24 @@ class LevelActivity(activity.Activity):
 
         self.buddies = {}
 
-        toolbar_box = ToolbarBox()
+        canvas = MyCanvas(self)
+        self.set_canvas(canvas)
+        canvas.show()
 
-        activity_button = ActivityToolbarButton(self)
-        toolbar_box.toolbar.insert(activity_button, 0)
+        toolbar_box = ToolbarBox()
+        self.set_toolbar_box(toolbar_box)
+
+        toolbar_box.toolbar.insert(ActivityButton(self), 0)
+        toolbar_box.toolbar.insert(TitleEntry(self), -1)
+        toolbar_box.toolbar.insert(DescriptionItem(self), -1)
+        toolbar_box.toolbar.insert(ShareButton(self), -1)
 
         separator = Gtk.SeparatorToolItem()
         separator.props.draw = False
         separator.set_expand(True)
         toolbar_box.toolbar.insert(separator, -1)
-
-        stop_button = StopButton(self)
-        toolbar_box.toolbar.insert(stop_button, -1)
-
-        self.set_toolbar_box(toolbar_box)
+        toolbar_box.toolbar.insert(StopButton(self), -1)
         toolbar_box.show_all()
-
-        # Draw the canvas
-        canvas = MyCanvas(self)
-        self.set_canvas(canvas)
-        canvas.show()
 
         self._collab = CollabWrapper(self)
         self._collab.message.connect(self.__message_cb)
