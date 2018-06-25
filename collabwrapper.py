@@ -293,14 +293,15 @@ class CollabWrapper(GObject.GObject):
         action = msg.get('action')
         if action == ACTION_INIT_REQUEST and self._leader:
             data = self.activity.get_data()
-            data = json.dumps(data)
-            OutgoingBlobTransfer(
-                buddy,
-                self.shared_activity.telepathy_conn,
-                data,
-                self.get_client_name(),
-                ACTION_INIT_RESPONSE,
-                ACTIVITY_FT_MIME)
+            if data is not None:
+                data = json.dumps(data)
+                OutgoingBlobTransfer(
+                    buddy,
+                    self.shared_activity.telepathy_conn,
+                    data,
+                    self.get_client_name(),
+                    ACTION_INIT_RESPONSE,
+                    ACTIVITY_FT_MIME)
             return
 
         if buddy:
