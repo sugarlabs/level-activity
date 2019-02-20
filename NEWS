@@ -1,0 +1,6 @@
+3
+
+* Add collaboration (James Cameron),
+* Use a secondary multicast channel for improved performance (James Cameron),
+* Draw no text when there is no accelerometer,
+* New translations (Chris Leonard, et al),
