@@ -27,7 +27,7 @@ from sugar3.graphics.toolbarbox import ToolbarBox
 from sugar3.graphics.alert import Alert
 from sugar3.graphics.icon import Icon
 
-from math import pi, sqrt
+from math import pi, sqrt, atan2, degrees
 from gettext import gettext as _
 from collections import deque
 
@@ -109,19 +109,17 @@ class MyCanvas(Gtk.DrawingArea):
         cr.arc(self.x, self.y, self.ball_radius, 0, 2 * pi)
         cr.fill()
 
+        # calculate angle to horizontal
+        angle = degrees(atan2(self.y - self.center[1], self.x - self.center[0]))
+        if angle < 0:
+            angle += 360
+
         # the text
         cr.set_source_rgb(0, 0, 0)  # black
         cr.move_to(width - 100, height - 80)
         cr.set_font_size(20)
 
-        # TRANS: x is for x-axis
-        cr.show_text(_("x: %.2f") % (self.x - width / 2,))
-
-        cr.move_to(width - 99, height - 60)
-        cr.set_font_size(20)
-
-        # TRANS: y is for y-axis
-        cr.show_text(_("y: %.2f") % (self.y - height / 2,))
+        cr.show_text(_("Angle: %.2f") % angle)
 
     def motion_cb(self, x, y):
         if len(self.prev) >= 2:
