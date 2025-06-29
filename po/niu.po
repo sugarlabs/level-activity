@@ -1,0 +1,61 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-02-20 17:02+1100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: niu\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: activity/activity.info:2
+msgid "Level"
+msgstr ""
+
+#: activity/activity.info:3
+msgid "Check inclination of surface with respect to ground."
+msgstr ""
+
+#. TRANS: x is for x-axis
+#: LevelActivity.py:118
+#, python-format
+msgid "x: %.2f"
+msgstr ""
+
+#. TRANS: y is for y-axis
+#: LevelActivity.py:124
+#, python-format
+msgid "y: %.2f"
+msgstr ""
+
+#: LevelActivity.py:296
+msgid "Activity not compatible with this system."
+msgstr ""
+
+#: LevelActivity.py:297
+msgid "Please erase the activity."
+msgstr ""
+
+#: LevelActivity.py:302
+msgid "You do not have an accelerometer."
+msgstr ""
+
+#: collabwrapper.py:194
+msgid "Joining activity..."
+msgstr ""
+
+#: collabwrapper.py:195 collabwrapper.py:207
+msgid "Please wait for the connection..."
+msgstr ""
+
+#: collabwrapper.py:206
+msgid "Resuming shared activity..."
+msgstr ""
